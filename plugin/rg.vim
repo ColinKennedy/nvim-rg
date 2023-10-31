@@ -32,7 +32,12 @@ function! s:ShowResults(data)
 endfunction
 
 function! s:RgEvent(job_id, data, event) dict
-  let msg = "Error: Pattern " . self.pattern . " not found"
+  if empty(self.pattern)
+    let l:text = self.cmd
+  else
+    let l:text = self.pattern
+  endif
+  let msg = "Error: Pattern " . l:text . " not found"
   if a:event == "stdout"
     let s:chunks[-1] .= a:data[0]
     call extend(s:chunks, a:data[1:])
@@ -73,6 +78,7 @@ function! s:RunCmd(cmd, pattern)
     \ "on_stdout": function("s:RgEvent"),
     \ "on_stderr": function("s:RgEvent"),
     \ "on_exit": function("s:RgEvent"),
+    \ "cmd": a:cmd,
     \ "pattern": a:pattern
     \ }
     let s:rg_job = jobstart(a:cmd, opts)
@@ -81,7 +87,12 @@ function! s:RunCmd(cmd, pattern)
   " Run w/o async if Vim
   let cmd_output = system(a:cmd)
   if cmd_output == ""
-    let msg = "Error: Pattern " . a:pattern . " not found"
+    if empty(a:pattern)
+      let l:text = a:cmd
+    else
+      let l:text = a:pattern
+    endif
+    let msg = "Error: Pattern " . l:text . " not found"
     call s:Alert(msg)
     return
   endif
