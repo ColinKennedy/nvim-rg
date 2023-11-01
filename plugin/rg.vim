@@ -84,7 +84,6 @@ function! s:RunCmd(cmd, pattern)
   endif
   " Run async if Neovim
   if has("nvim") && g:rg_run_async isnot 0
-    call s:Alert("Searching...")
     let opts = {
     \ "on_stdout": function("s:RgEvent"),
     \ "on_stderr": function("s:RgEvent"),
